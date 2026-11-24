@@ -1,9 +1,21 @@
 from datetime import datetime, time, timezone
 
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models import Card, Deck, ReviewLog
 from app.schemas import DeckResponse
+
+
+def get_owned_deck(deck_id: int, user_id: int, session: Session) -> Deck:
+    deck = session.query(Deck).filter(
+        Deck.id == deck_id, Deck.user_id == user_id
+    ).first()
+    if not deck:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Deck não encontrado."
+        )
+    return deck
 
 
 def serialize_deck(deck: Deck, session: Session, user_id: int) -> DeckResponse:

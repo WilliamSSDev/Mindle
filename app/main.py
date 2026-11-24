@@ -1,33 +1,35 @@
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from app.routes.auth import auth_route
-from app.routes.user import user_route
-from app.routes.cards import cards_route
-from app.routes.decks import decks_route
-from fastapi.middleware.cors import CORSMiddleware
-from app.utils import limiter,SlowAPIMiddleware
 from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
+from app.routes.auth import router as auth_router
+from app.routes.cards import router as cards_router
+from app.routes.decks import router as decks_router
+from app.routes.user import router as user_router
+from app.utils import SlowAPIMiddleware, limiter
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-  allow_origins=[
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-  ],
+    allow_origins=[
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-app.include_router(auth_route)
-app.include_router(user_route)
-app.include_router(cards_route)
-app.include_router(decks_route)
+app.include_router(auth_router)
+app.include_router(user_router)
+app.include_router(cards_router)
+app.include_router(decks_router)
 
 frontend_directory = Path(__file__).resolve().parent.parent / "frontend"
 app.mount("/", StaticFiles(directory=frontend_directory, html=True), name="frontend")

@@ -1,154 +1,155 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, Request
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import JSONResponse
-from app.dependencies import get_session, verify_token
-from app.schemas import UserRegister, UserResponse, UserLogin
-from app.models import User
-from jose import jwt, JWTError
-from app.auth import authenticate_user, create_token, bcrypt_context
-from sqlalchemy.orm import Session
 from datetime import timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
+from app.auth import (
+    ALGORITHM,
+    SECRET_KEY,
+    authenticate_user,
+    bcrypt_context,
+    create_token,
+)
+from app.dependencies import get_session, verify_token
+from app.models import User
+from app.schemas import UserLogin, UserRegister, UserResponse
 from app.utils import limiter
-import os
 
-auth_route = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
-SECRET_KEY = os.getenv('SECRET_KEY')
-ALGORITHM = os.getenv('ALGORITHM')
 
-@auth_route.post('/register', response_model=UserResponse)
+def _set_token_cookies(
+    response: Response, access_token: str, refresh_token: str
+) -> None:
+    for name, token in (
+        ("access_token", access_token),
+        ("refresh_token", refresh_token),
+    ):
+        response.set_cookie(
+            key=name,
+            value=token,
+            httponly=True,
+            secure=False,  # Local development uses HTTP.
+            samesite="lax",
+            path="/",
+        )
+
+
+@router.post("/register", response_model=UserResponse)
 @limiter.limit("5/minute")
-async def register(request: Request, usuario: UserRegister, session: Session = Depends(get_session)):
-    admin = False
-    has_user = session.query(User).filter(User.email==usuario.email).first()
+async def register_user(
+    request: Request,
+    user_data: UserRegister,
+    session: Session = Depends(get_session),
+):
+    existing_user = session.query(User).filter(User.email == user_data.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User already registered.",
+        )
 
-    if has_user:
-        raise HTTPException(status_code=400, detail="User already registered.")
-    
-    senha_criptografada = bcrypt_context.hash(usuario.password)
-    if usuario.email == 'admin@example.com':
-        admin = True
-    novo_usuario = User(name=usuario.name, email=usuario.email, password=senha_criptografada, admin=admin)
-    session.add(novo_usuario)
+    user = User(
+        name=user_data.name,
+        email=user_data.email,
+        password=bcrypt_context.hash(user_data.password),
+        admin=user_data.email == "admin@example.com",
+    )
+    session.add(user)
     session.commit()
-    return novo_usuario
+    return user
 
 
-@auth_route.post("/login")
+@router.post("/login")
 @limiter.limit("5/minute")
-async def login(request: Request, response: Response, usuario: UserLogin, session: Session = Depends(get_session)):
+async def login_user(
+    request: Request,
+    credentials: UserLogin,
+    session: Session = Depends(get_session),
+):
+    user = authenticate_user(credentials.email, credentials.password, session)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
 
-    # print(request.client.host)
-
-    usuario = authenticate_user(usuario.email, usuario.password, session)
-
-    if not usuario:
-        raise HTTPException(status_code=401, detail='User not found')
-    
-    bearer_token = create_token(usuario.id)
-    refresh_token = create_token(usuario.id, timedelta(days=7))
-
+    access_token = create_token(user.id)
+    refresh_token = create_token(user.id, timedelta(days=7))
     response = JSONResponse(
-        content={
-            "message": "Login successful",
-            "bearer_token": bearer_token
-        }
+        content={"message": "Login successful", "bearer_token": access_token}
     )
-    response.set_cookie(
-        key="access_token",
-        value=bearer_token,
-        httponly=True,
-        secure=False,      # for localhost only
-        samesite="Lax",  
-        path="/"
-    )
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=False,      # for localhost only
-        samesite="Lax",  
-        path="/"
-    )
-
+    _set_token_cookies(response, access_token, refresh_token)
     return response
 
-@auth_route.post("/login-form")
-async def login_form(response: Response, user: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
 
-    usuario = authenticate_user(user.username, user.password, session)
+@router.post("/login-form")
+async def login_with_form(
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: Session = Depends(get_session),
+):
+    user = authenticate_user(form_data.username, form_data.password, session)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
 
-    if not usuario:
-        raise HTTPException(status_code=401, detail='User not found')
-    
-    bearer_token = create_token(usuario.id)
-    refresh_token = create_token(usuario.id, timedelta(days=7))
-
-    response.set_cookie(
-        key="access_token",
-        value=bearer_token,
-        httponly=True
-    )
-
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True
-    )
-    
-    return {"access_token": bearer_token, "refresh_token": refresh_token, "token_type": 'Bearer '}
-
-@auth_route.post(path="/refresh")
-@limiter.limit("5/minute")
-async def use_refresh_token(response: Response, request: Request, session = Depends(get_session)):
-
-    # Get cookies
-    refresh_token = request.cookies.get('refresh_token')
-
-    if not refresh_token:
-
-        raise HTTPException(401, "refresh token missing.")
-    
-    try:
-
-        payload = jwt.decode(token=refresh_token, key=SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get('sub'))
-
-    except JWTError:
-
-        raise HTTPException(401, "invalid refresh token")
-    
-    usuario = session.query(User).filter(User.id == user_id).first()
-
-    access_token = create_token(user_id, timedelta(minutes=30))
-
-    response.set_cookie(
-        key='access_token',
-        value=access_token,
-        httponly=True
-    )
-
+    access_token = create_token(user.id)
+    refresh_token = create_token(user.id, timedelta(days=7))
+    _set_token_cookies(response, access_token, refresh_token)
     return {
         "access_token": access_token,
-        "authenticated": True
+        "refresh_token": refresh_token,
+        "token_type": "Bearer ",
     }
 
 
+@router.post("/refresh")
+@limiter.limit("5/minute")
+async def refresh_access_token(
+    response: Response,
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="refresh token missing."
+        )
 
-@auth_route.post("/protected")
-async def protected(request: Request, usuario = Depends(verify_token)):
-    token = request.cookies.get("access_token")
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+    except (JWTError, TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid refresh token"
+        )
 
-    if not token:
+    user = session.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
+
+    access_token = create_token(user.id, timedelta(minutes=30))
+    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    return {"access_token": access_token, "authenticated": True}
+
+
+@router.post("/protected")
+async def check_authentication(
+    request: Request, current_user: User = Depends(verify_token)
+):
+    if not request.cookies.get("access_token"):
         return {"error": "not authenticated", "authenticated": False}
-
     return {"message": "you are authenticated", "authenticated": True}
 
 
-@auth_route.post("/logout")
+@router.post("/logout")
 async def logout_user(response: Response):
-
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
-
     return {"message": "Logged out successfully"}

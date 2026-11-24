@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class UserRegister(BaseModel):
-
     name: str
     email: EmailStr
     password: str
@@ -13,22 +12,17 @@ class UserResponse(BaseModel):
     email: EmailStr
 
 class UserLogin(BaseModel):
-
     email: str
     password: str
 
 class Card(BaseModel):
-
     front_content: str
     back_content: str
     deck_id: int | None = None
 
-
 class DeckCreate(BaseModel):
-
     name: str
     description: str | None = None
-
 
 class DeckResponse(BaseModel):
 

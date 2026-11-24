@@ -10,6 +10,10 @@
   historical Alembic chain can bootstrap the current model schema.
 - Updated the frontend guide to distinguish its original frontend-only commit
   boundaries from this later project-wide synchronization.
+- GitHub accepted the initial push and reported the repository's move from
+  `WilliamSSDev/my-crud` to `WilliamSSDev/Mindle`. Updated the README clone URL
+  and local `origin` to the canonical Mindle repository, then pushed the
+  documentation correction without rewriting the published history.
 - Added `.env.example` containing placeholders only, and allowed this single
   template through `.gitignore`; actual `.env` files remain ignored.
 - Normalized `requirements.txt` from UTF-16 to UTF-8 and added the missing

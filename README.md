@@ -9,8 +9,7 @@ browser speech voices.
 
 The current design uses a charcoal canvas, violet accents and a responsive
 sidebar. Its first release covers the dashboard, deck library, deck details,
-card editor and review flow. The GitHub repository retains its original name,
-`my-crud`; the product name is **Mindle**.
+card editor and review flow. The product and GitHub repository are named **Mindle**.
 
 ## Try the design without an account or database
 
@@ -60,7 +59,7 @@ its corresponding Python driver, which is not included in the SQLite setup.
 ### 1. Clone the repository
 
 ```powershell
-git clone https://github.com/WilliamSSDev/my-crud.git mindle
+git clone https://github.com/WilliamSSDev/Mindle.git mindle
 cd mindle
 ```
 

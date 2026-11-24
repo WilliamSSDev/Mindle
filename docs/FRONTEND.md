@@ -76,7 +76,8 @@ The rollout also records the earlier frontend cleanup: removed unused root
 `index.css`, `studyflow.css`, `login_page.css`, the commented-out root `index.js`,
 and unused `assets/js/index.js`, `auth.js`, `homepage.js`, `charts.js` duplicates.
 Their active equivalents remain referenced by the retained HTML pages. The
-three empty backend-module removals from the earlier task remain uncommitted.
+three empty backend-module removals were outside the initial frontend commits;
+their later synchronization is recorded in [PROJECT_CHANGELOG.md](PROJECT_CHANGELOG.md).
 
 ## Routes and supported interactions
 
@@ -157,5 +158,6 @@ for QA. Actual speech output depends on installed local voices.
    the retained pages and asset graph consistent.
 
 Only selected frontend, documentation and verification paths belong to these
-commits. Pre-existing changes under `app/`, migrations, dependency files and
-unrelated working-tree edits are neither modified nor committed by this task.
+commits. Pre-existing backend and dependency changes were not modified or
+committed during that frontend-only task. Their later GitHub synchronization is
+documented separately in [PROJECT_CHANGELOG.md](PROJECT_CHANGELOG.md).

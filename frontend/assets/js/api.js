@@ -15,7 +15,7 @@ export async function apiFetch(url, options = {}) {
 
 export async function viewCards(amount, deckId = null) {
     const query = deckId ? `?deck_id=${encodeURIComponent(deckId)}` : ""
-    const response = await apiFetch(`${API_BASE_URL}/cards/cards/${amount}${query}`)
+    const response = await apiFetch(`${API_BASE_URL}/cards/${amount}${query}`)
     return response.json()
 }
 

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyFlow | Seu espaço de estudo</title>
+    <title>Mindle | Seu espaço de estudo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/add-card.css">
+    <link rel="stylesheet" href="assets/css/speech.css?v=2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -19,7 +20,7 @@
         <!-- HEADER -->
         <header class="header">
             <h1 class="logo">
-                Study<span id="cards-logo">Flow</span>
+                M<span id="cards-logo">indle</span>
             </h1>
 
             <nav>
@@ -216,6 +217,13 @@
                         </li>
                     </ul>
 
+                    <div class="speech-controls" id="review-speech-controls" aria-label="Leitura do flashcard">
+                        <label>Voz <select data-speech-voice disabled></select></label>
+                        <button class="secondary-button" type="button" data-speech-source disabled>Ouvir este lado</button>
+                        <button class="secondary-button" type="button" data-speech-stop disabled>Parar</button>
+                        <p class="speech-status" data-speech-status role="status">Carregando vozes do dispositivo...</p>
+                    </div>
+
                     <div class="review-actions">
                         <button type="button" class="show-answer-button" id="show-answer-button">
                             <i class="fa-solid fa-eye"></i> Mostrar Resposta
@@ -308,6 +316,17 @@
                         <div id="back-content" class="editor-surface" contenteditable="true" data-placeholder="Digite a resposta..." role="textbox" aria-multiline="true"></div>
                     </div>
 
+                    <fieldset class="speech-panel">
+                        <legend>Ouvir o flashcard</legend>
+                        <div class="speech-controls" id="editor-speech-controls">
+                            <label>Voz <select data-speech-voice disabled></select></label>
+                            <button class="secondary-button" type="button" data-speech-source disabled>Ouvir pergunta</button>
+                            <button class="secondary-button" type="button" data-speech-source disabled>Ouvir resposta</button>
+                            <button class="secondary-button" type="button" data-speech-stop disabled>Parar</button>
+                            <p class="speech-status" data-speech-status role="status">Carregando vozes do dispositivo...</p>
+                        </div>
+                    </fieldset>
+
                     <button class="primary-button save-card-button" type="submit" id="submit-button"><i class="fa-solid fa-check"></i> Salvar flashcard</button>
                 </form>
             </section>
@@ -374,6 +393,7 @@
     </div>
     <div class="toast-region" id="toast-region" aria-live="polite"></div>
 
-    <script type="module" src="assets/js/studyflow.js"></script>
+    <script type="module" src="assets/js/speech-init.js?v=2"></script>
+    <script type="module" src="assets/js/studyflow.js?v=2"></script>
 </body>
 </html>

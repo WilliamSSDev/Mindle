@@ -58,7 +58,8 @@ branding says Mindle; their previous layout and backend behavior are retained.
 | `frontend/mindle/js/app.js` | Hash routing, view state, form submission, shared dialogs, keyboard controls, appearance and speech lifecycle. |
 | `frontend/assets/js/speech.js` | Reused local-only speech controller from the earlier speech feature. Added as an explicit dependency of Mindle; no audio file generation. |
 | `frontend/assets/js/speech-init.js`, `frontend/assets/css/speech.css` | Earlier standalone speech UI dependencies retained for the legacy screens. |
-| `frontend/login_page.html`, `register_page.html`, `homepage.html`, `add_card.html`, `pages/statistics.html` | Visible product-name replacements only in this increment. Earlier working-tree edits to these files are preserved. |
+| `frontend/login_page.html`, `register_page.html`, `homepage.html`, `add_card.html`, `pages/statistics.html` | Visible product-name replacements. Retained speech controls in add-card and corrected relative statistics assets. |
+| `frontend/assets/js/studyflow.js`, `frontend/assets/js/api.js` | Carry forward the earlier legacy speech wiring, corrected statistics navigation, and corrected card-list URL so the preserved screens keep working. |
 | `tests/mindle.test.mjs` | Preview isolation, create/review/delete behavior, existing API contracts, authentication refresh, escaping and activity date tests. |
 | `tests/test_frontend.py` | Existing asset/link checks; legacy speech assertions now target the preserved dashboard instead of the new entry page. |
 | `scripts/check-mindle-browser.mjs` | Dependency-free real-browser smoke check with an ephemeral server/profile and desktop/mobile screenshots in the OS temporary directory. |
@@ -70,6 +71,12 @@ library or API helper. These remain isolated to the preserved legacy pages.
 Keep new views within `mindle/`; add a service method rather than issuing fetches
 from page templates. Edit theme values in `tokens.css` instead of hardcoding
 colors throughout views.
+
+The rollout also records the earlier frontend cleanup: removed unused root
+`index.css`, `studyflow.css`, `login_page.css`, the commented-out root `index.js`,
+and unused `assets/js/index.js`, `auth.js`, `homepage.js`, `charts.js` duplicates.
+Their active equivalents remain referenced by the retained HTML pages. The
+three empty backend-module removals from the earlier task remain uncommitted.
 
 ## Routes and supported interactions
 
@@ -146,7 +153,8 @@ for QA. Actual speech output depends on installed local voices.
    frontend, speech dependency, service/unit/browser checks and this guide.
 2. `feat(frontend): route the app to Mindle and document the rollout` — root
    entry, preserved dashboard, visible legacy branding, asset-check update and
-   the explicit change log.
+   the explicit change log, and the earlier frontend cleanup required to leave
+   the retained pages and asset graph consistent.
 
 Only selected frontend, documentation and verification paths belong to these
 commits. Pre-existing changes under `app/`, migrations, dependency files and

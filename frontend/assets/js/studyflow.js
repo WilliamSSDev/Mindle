@@ -14,6 +14,7 @@ import {
     getReviewActivity,
 } from "./api.js"
 import { createActivityChart } from "../../charts.js"
+import { speechPlayer } from "./speech-init.js?v=2"
 
 const elements = {
     userInfo: document.getElementById("user-info"),
@@ -216,6 +217,7 @@ function renderDeckCards(cards) {
 }
 
 function hideMainSections() {
+    speechPlayer.stop()
     document.querySelectorAll(".view-cards-window, .statistics-section, .review-section, .empty-review-section, .add-card-section").forEach(section => {
         section.style.display = "none"
     })
@@ -272,6 +274,7 @@ function updateStudyProgress(cardsToReview, studiedToday = 0) {
 }
 
 function renderStudyCard(card) {
+    speechPlayer.stop()
     state.currentCard = card
     state.isFlipped = false
     elements.cardInner.classList.remove("is-flipped")
@@ -313,6 +316,7 @@ async function startStudy() {
 
 async function answerStudyCard(difficulty) {
     if (!state.currentCard) return
+    speechPlayer.stop()
     const buttons = [...elements.difficultyButtons.querySelectorAll("button")]
     buttons.forEach(button => { button.disabled = true })
     try {
@@ -436,12 +440,13 @@ async function initialize() {
         if (!activityChart) {
             loadActivity().catch(() => showToast("Não foi possível carregar as estatísticas.", "error"))
         } else {
-            window.location.href = "statistics.html"
+            window.location.href = "pages/statistics.html"
         }
         
     })
     // elements.cancelAddCard.addEventListener("click", closeEditor)
     elements.answerButton.addEventListener("click", () => {
+        speechPlayer.stop()
         state.isFlipped = !state.isFlipped
         elements.cardInner.classList.toggle("is-flipped", state.isFlipped)
         elements.difficultyButtons.style.display = state.isFlipped ? "flex" : "none"
@@ -450,6 +455,7 @@ async function initialize() {
         button.addEventListener("click", () => answerStudyCard(button.dataset.difficulty))
     })
     elements.logoutButton.addEventListener("click", async () => {
+        speechPlayer.stop()
         await logout()
         window.location.href = "login_page.html"
     })
@@ -457,7 +463,7 @@ async function initialize() {
     elements.deckForm.addEventListener("submit", saveDeck)
 
     document.addEventListener("keydown", event => {
-        if (event.target.isContentEditable || ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return
+        if (event.target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(event.target.tagName)) return
         if (event.code === "Space" && state.currentCard) {
             event.preventDefault()
             elements.answerButton.click()
@@ -486,6 +492,7 @@ async function saveDeck(event) {
 
 async function saveCard(event) {
     event.preventDefault()
+    speechPlayer.stop()
 
     const dropdown = document.querySelector("#decks");
     const deckId = Number(dropdown?.value);

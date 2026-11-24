@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101116">
+    <meta name="description" content="Mindle. A little learning. A lasting difference.">
+    <title>Mindle — A little, every day.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;650;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/tokens.css">
+    <link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="brand-row">
+            <a class="brand" href="#dashboard" aria-label="Mindle home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 23V12a5 5 0 0 1 10 0v8M15 12a5 5 0 0 1 10 0v13"/></svg><span>Mindle</span></a>
+            <button class="icon-button sidebar-toggle" data-action="sidebar" aria-label="Collapse navigation" aria-expanded="true"><span data-icon="panel"></span></button>
+        </div>
+        <nav>
+            <div class="nav-group"><p class="nav-label">Overview</p><a class="nav-item" href="#dashboard" data-nav="dashboard"><span data-icon="grid"></span><span>Dashboard</span></a></div>
+            <div class="nav-group"><p class="nav-label">Learning</p>
+                <a class="nav-item" href="../pages/statistics.html"><span data-icon="chart"></span><span>Statistics</span><span class="nav-note">Classic</span></a>
+                <a class="nav-item" href="#decks" data-nav="decks"><span data-icon="decks"></span><span>Decks</span></a>
+                <a class="nav-item" href="#create" data-nav="create"><span data-icon="plus"></span><span>Create card</span></a>
+            </div>
+            <div class="nav-group"><p class="nav-label">Discover</p><span class="nav-item unavailable" aria-disabled="true"><span data-icon="video"></span><span>Video learning</span><span class="nav-note">Soon</span></span></div>
+            <div class="nav-group"><p class="nav-label">Account</p>
+                <button class="nav-item" data-action="account"><span data-icon="user"></span><span>Profile</span></button>
+                <button class="nav-item" data-action="theme"><span data-icon="sun"></span><span>Appearance</span></button>
+            </div>
+        </nav>
+        <div class="daily-card"><strong>A little, every day.</strong><p id="daily-caption">Your next small step is waiting.</p><div class="progress-track"><span id="daily-progress"></span></div><a href="#decks">Keep your momentum going <span data-icon="sparkles"></span></a></div>
+        <button class="sidebar-user" data-action="account"><span class="avatar" data-initials>M</span><span class="user-copy"><strong data-user-name>Your workspace</strong><small>Personal workspace</small></span></button>
+    </aside>
+    <button class="sidebar-scrim" data-action="sidebar" aria-label="Close navigation" hidden></button>
+    <div class="workspace">
+        <header class="topbar">
+            <button class="icon-button mobile-menu" data-action="sidebar" aria-label="Open navigation" aria-expanded="false"><span data-icon="menu"></span></button>
+            <form class="global-search" id="global-search" role="search"><span data-icon="search"></span><input name="query" aria-label="Search decks" placeholder="Search your decks…" autocomplete="off"><kbd>/</kbd></form>
+            <div class="topbar-actions"><a class="preview-label" id="preview-label" href="../login_page.html" hidden>Design preview · Sign in</a><span class="streak"><span data-icon="flame"></span><span id="top-streak">One day at a time</span></span><button class="icon-button" data-action="theme" aria-label="Switch color theme"><span data-icon="sun"></span></button><button class="avatar" data-action="account" data-initials aria-label="Your account">M</button></div>
+        </header>
+        <main id="main" tabindex="-1" aria-busy="true"><div class="loading-state"><span class="loading-dot"></span>Opening your workspace…</div></main>
+        <footer class="app-footer">Mindle. A little learning. A lasting difference.</footer>
+    </div>
+    <dialog id="deck-dialog" class="modal">
+        <form id="deck-form">
+            <div class="modal-heading"><h2>Create a deck</h2><button class="icon-button" type="button" data-close="deck-dialog" aria-label="Close dialog"><span data-icon="close"></span></button></div>
+            <p class="muted">Give your next collection of knowledge a home.</p>
+            <label for="deck-name">Deck name</label><input id="deck-name" name="name" placeholder="e.g. Everyday French" maxlength="80" required>
+            <label for="deck-description">Description <span class="muted">(optional)</span></label><textarea id="deck-description" name="description" placeholder="What will you learn?" maxlength="180" rows="3"></textarea>
+            <p class="form-error" id="deck-error" role="alert"></p>
+            <div class="modal-actions"><button class="button secondary" type="button" data-close="deck-dialog">Cancel</button><button class="button primary" type="submit">Create deck</button></div>
+        </form>
+    </dialog>
+    <dialog id="preview-dialog" class="modal card-preview"><div class="modal-heading"><h2>Card preview</h2><button class="icon-button" data-close="preview-dialog" aria-label="Close preview"><span data-icon="close"></span></button></div><div id="preview-content"></div></dialog>
+    <dialog id="account-dialog" class="modal"><div class="modal-heading"><h2>Your workspace</h2><button class="icon-button" data-close="account-dialog" aria-label="Close account"><span data-icon="close"></span></button></div><div id="account-content"></div></dialog>
+    <div class="toast-region" id="toasts" aria-live="polite"></div>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

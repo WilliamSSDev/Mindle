@@ -1,0 +1,38 @@
+/* Reference 01: shared Mindle foundations. Change themes here, not in views. */
+:root {
+    color-scheme: dark;
+    --canvas: #101116;
+    --sidebar: #12131a;
+    --surface: #181a22;
+    --surface-raised: #222430;
+    --border: #2a2c38;
+    --text: #f0f0f5;
+    --muted: #9596aa;
+    --violet: #ad9fff;
+    --violet-hover: #bdB1ff;
+    --violet-soft: #28223e;
+    --success: #7dd7b4;
+    --warning: #dab37e;
+    --danger: #e9949c;
+    --button-ink: #14101f;
+    --radius: 12px;
+    --sidebar-width: 216px;
+    --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+:root[data-theme="light"] {
+    color-scheme: light;
+    --canvas: #f5f5f8;
+    --sidebar: #eeeef4;
+    --surface: #ffffff;
+    --surface-raised: #e9e8f0;
+    --border: #dcdce7;
+    --text: #20212c;
+    --muted: #696a7c;
+    --violet: #7460cf;
+    --violet-hover: #6651bd;
+    --violet-soft: #ebe5fc;
+    --success: #237d61;
+    --warning: #91602c;
+    --danger: #b13c50;
+    --button-ink: #ffffff;
+}
